@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      golang: 1.22
+  build:
+    commands:
+      - cd backend
+      - go mod download
+      - CGO_ENABLED=0 GOOS=linux go build -o bootstrap .
+      - cd ../infra
+      - sam build
+artifacts:
+  files:
+    - infra/.aws-sam/**/*
+    - infra/template.yaml

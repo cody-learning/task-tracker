@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: task-tracker - SAM
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: provided.al2023
+    Architectures:
+      - x86_64
+
+Resources:
+  TaskTrackerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/
+      Handler: bootstrap
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+
+  TaskTrackerApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${TaskTrackerApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
